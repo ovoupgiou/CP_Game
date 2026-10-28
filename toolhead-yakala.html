@@ -53,7 +53,7 @@ rs();addEventListener('resize',rs);
 function show(m){mode=m;const t=T[L],w=caught>=GOAL;
 ov.innerHTML=(m?'':PR)+'<h1>'+(m?(w?t.w:t.l):t.t)+'</h1><p>'+(m?t.c(caught)+(w?'':'<br>'+t.r):t.d)+'</p>'+(m?'<div id="lb" class="lb"></div>':'')+'<button id="go">'+(m?t.p:t.s)+'</button><button id="lg">'+(L=='tr'?'EN':'TR')+'</button>'+(m?'':who());ov.style.display='flex';if(m)lbFill();if(!run&&!idleOn){idleOn=true;requestAnimationFrame(idle)}}
 ov.onclick=e=>{if(e.target.id=='go')PL?start():regForm(start);if(e.target.id=='chg'){PL=null;try{localStorage.removeItem('th_player')}catch(_){}show(mode)}if(e.target.id=='lg'){L=L=='tr'?'en':'tr';show(mode)}};
-const API='';
+const API='https://script.google.com/macros/s/AKfycbxh5H6_s3c4IYh7X6qBrZGni3koNSebJ0WTwXZA0RAvV7b1uiEiw5iI2nafQgJIvSB2/exec';
 const GK='catch';
 const RT={en:{h:'Join the leaderboard',nm:'Username',em:'Email',c1:'I agree that my username, email and score are stored for the leaderboard and prize draw.',c2:'Send me news about Co Print (optional).',go:'Continue',bad:'Check your username (2-16 characters) and email.',need:'Please tick the first box to continue.',as:'Playing as',ch:'Change',top:'Top players'},
 tr:{h:'Skor tablosuna katıl',nm:'Kullanıcı adı',em:'E-posta',c1:'Kullanıcı adımın, e-postamın ve skorumun skor tablosu ve ödül çekilişi için saklanmasını kabul ediyorum.',c2:'Co Print hakkında haber almak istiyorum (isteğe bağlı).',go:'Devam',bad:'Kullanıcı adını (2-16 karakter) ve e-postayı kontrol et.',need:'Devam etmek için ilk kutuyu işaretle.',as:'Oyuncu',ch:'Değiştir',top:'En iyiler'}};
