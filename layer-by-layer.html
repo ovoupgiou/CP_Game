@@ -69,7 +69,7 @@ a.push({n:PL.name,s:s});a.sort((p,q)=>q.s-p.s);a=a.slice(0,10);try{localStorage.
 post({type:'score',game:GK,name:PL.name,email:PL.email,mkt:PL.mkt,score:s,ts:Date.now()})}
 function lbFill(){let a=[];try{a=JSON.parse(localStorage.getItem(lbKey())||'[]')}catch(_){}
 const draw=a=>{const el=document.getElementById('lb');if(el)el.innerHTML='<div style="font-weight:800">'+RT[L].top+'</div>'+a.slice(0,5).map((r,i)=>'<div'+(PL&&r.n==PL.name?' class="me"':'')+'><span>'+(i+1)+'. '+esc(r.n)+'</span><b>'+esc(r.s)+'</b></div>').join('')};
-draw(a);if(API)fetch(API+'?game='+GK).then(r=>r.json()).then(d=>{if(Array.isArray(d))draw(d)}).catch(()=>{})}
+draw(a);if(API)setTimeout(()=>fetch(API+'?game='+GK+'&t='+Date.now()).then(r=>r.json()).then(d=>{if(!Array.isArray(d))return;if(PL){const m=a.find(r=>r.n==PL.name);if(m){const q=d.find(r=>r.n==PL.name);if(!q)d.push({n:m.n,s:m.s});else if(m.s>q.s)q.s=m.s;d.sort((p,z)=>z.s-p.s)}}draw(d)}).catch(()=>{}),1200)}
 function who(){return PL?'<div class="who">'+RT[L].as+' <b>'+esc(PL.name)+'</b> · <a id="chg">'+RT[L].ch+'</a></div>':''}
 function regForm(next){const t=RT[L];
 ov.innerHTML='<h1>'+t.h+'</h1><form class="f" id="rf" novalidate><input type="text" id="un" maxlength="16" placeholder="'+t.nm+'" autocomplete="nickname"><input type="email" id="ue" placeholder="'+t.em+'" autocomplete="email"><label><input type="checkbox" id="c1"><span>'+t.c1+'</span></label><label><input type="checkbox" id="c2"><span>'+t.c2+'</span></label><div class="er" id="er"></div><button id="sb" type="submit">'+t.go+'</button></form>';
