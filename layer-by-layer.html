@@ -56,20 +56,22 @@ function pills(){pg.textContent=score;lv.textContent=(L=='tr'?'En iyi ':'Best ')
 function show(m){mode=m;const t=T[L];
 ov.innerHTML=(m?'':PR)+'<h1>'+(m?t.l:t.t)+'</h1><p>'+(m?t.c(score)+'<br>'+(newb?t.n:t.b(best)):t.d)+'</p>'+(m?'<div id="lb" class="lb"></div>':'')+'<button id="go">'+(m?t.p:t.s)+'</button><button id="lg">'+(L=='tr'?'EN':'TR')+'</button>'+(m?'':who());ov.style.display='flex';if(m)lbFill();pills();if(!run&&!idleOn){idleOn=true;requestAnimationFrame(idle)}}
 ov.onclick=e=>{if(e.target.id=='go')PL?start():regForm(start);if(e.target.id=='chg'){PL=null;try{localStorage.removeItem('th_player')}catch(_){}show(mode)}if(e.target.id=='lg'){L=L=='tr'?'en':'tr';show(mode)}};
-const API='https://script.google.com/macros/s/AKfycbygY3PecJUu082Uj-QgJH05b1hi_ACGj3YFRE1WKhpVHfNndE79sU97mYQ3hD2JXR8/exec';
+const GS_URL='',SB_URL='https://ufzhsedfkihbuybxfgfy.supabase.co',SB_KEY='sb_publishable_Xpx7sKguWrzAUIMI-JLreg_dYE1d5qP';
+const sb=(fn,body)=>fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,...(SB_KEY.startsWith('eyJ')?{Authorization:'Bearer '+SB_KEY}:{})},body:JSON.stringify(body)});
 const GK='tower';
 const RT={en:{h:'Join the leaderboard',nm:'Username',em:'Email',c1:'I agree that my username, email and score are stored for the leaderboard and prize draw.',c2:'Send me news about Co Print (optional).',go:'Continue',bad:'Check your username (2-16 characters) and email.',need:'Please tick the first box to continue.',as:'Playing as',ch:'Change',top:'Top players'},
 tr:{h:'Skor tablosuna katıl',nm:'Kullanıcı adı',em:'E-posta',c1:'Kullanıcı adımın, e-postamın ve skorumun skor tablosu ve ödül çekilişi için saklanmasını kabul ediyorum.',c2:'Co Print hakkında haber almak istiyorum (isteğe bağlı).',go:'Devam',bad:'Kullanıcı adını (2-16 karakter) ve e-postayı kontrol et.',need:'Devam etmek için ilk kutuyu işaretle.',as:'Oyuncu',ch:'Değiştir',top:'En iyiler'}};
 let PL=null;try{PL=JSON.parse(localStorage.getItem('th_player')||'null')}catch(_){}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const lbKey=()=>'th_lb_'+GK;
-function post(o){if(!API)return;try{fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(o)}).catch(()=>{})}catch(_){}}
+function send(b,n){sb('submit_score',b).then(r=>{if(!r.ok)throw 0}).catch(()=>{if((n||0)<3)setTimeout(()=>send(b,(n||0)+1),3000*((n||0)+1))})}
+function post(o){if(SB_URL)send({p_game:o.game,p_name:o.name,p_email:o.email,p_mkt:!!o.mkt,p_score:o.score||0});else if(GS_URL)try{fetch(GS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(o)}).catch(()=>{})}catch(_){}}
 function addScore(s){if(!PL)return;let a=[];try{a=JSON.parse(localStorage.getItem(lbKey())||'[]')}catch(_){}
 a.push({n:PL.name,s:s});a.sort((p,q)=>q.s-p.s);a=a.slice(0,10);try{localStorage.setItem(lbKey(),JSON.stringify(a))}catch(_){}
 post({type:'score',game:GK,name:PL.name,email:PL.email,mkt:PL.mkt,score:s,ts:Date.now()})}
 function lbFill(){let a=[];try{a=JSON.parse(localStorage.getItem(lbKey())||'[]')}catch(_){}
 const draw=a=>{const el=document.getElementById('lb');if(el)el.innerHTML='<div style="font-weight:800">'+RT[L].top+'</div>'+a.slice(0,5).map((r,i)=>'<div'+(PL&&r.n==PL.name?' class="me"':'')+'><span>'+(i+1)+'. '+esc(r.n)+'</span><b>'+esc(r.s)+'</b></div>').join('')};
-draw(a);if(API)setTimeout(()=>fetch(API+'?game='+GK+'&t='+Date.now()).then(r=>r.json()).then(d=>{if(!Array.isArray(d))return;if(PL){const m=a.find(r=>r.n==PL.name);if(m){const q=d.find(r=>r.n==PL.name);if(!q)d.push({n:m.n,s:m.s});else if(m.s>q.s)q.s=m.s;d.sort((p,z)=>z.s-p.s)}}draw(d)}).catch(()=>{}),1200)}
+draw(a);if(SB_URL||GS_URL)setTimeout(()=>(SB_URL?sb('get_top',{p_game:GK}):fetch(GS_URL+'?game='+GK+'&t='+Date.now())).then(r=>r.json()).then(d=>{if(!Array.isArray(d))return;if(PL){const m=a.find(r=>r.n==PL.name);if(m){const q=d.find(r=>r.n==PL.name);if(!q)d.push({n:m.n,s:m.s});else if(m.s>q.s)q.s=m.s;d.sort((p,z)=>z.s-p.s)}}draw(d)}).catch(()=>{}),1200)}
 function who(){return PL?'<div class="who">'+RT[L].as+' <b>'+esc(PL.name)+'</b> · <a id="chg">'+RT[L].ch+'</a></div>':''}
 function regForm(next){const t=RT[L];
 ov.innerHTML='<h1>'+t.h+'</h1><form class="f" id="rf" novalidate><input type="text" id="un" maxlength="16" placeholder="'+t.nm+'" autocomplete="nickname"><input type="email" id="ue" placeholder="'+t.em+'" autocomplete="email"><label><input type="checkbox" id="c1"><span>'+t.c1+'</span></label><label><input type="checkbox" id="c2"><span>'+t.c2+'</span></label><div class="er" id="er"></div><button id="sb" type="submit">'+t.go+'</button></form>';
